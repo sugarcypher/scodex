@@ -313,3 +313,88 @@ export const CONSENT_PURPOSES = {
     dataTypes: ['anonymized_usage', 'aggregated_data'],
   },
 } as const;
+
+export const DISCLAIMER_CONTENT = {
+  sections: [
+    {
+      title: 'Medical & Health Disclaimer',
+      content: `
+• This app is for educational and informational purposes only
+• NOT intended as medical advice, diagnosis, or treatment
+• Always consult qualified healthcare professionals for medical decisions
+• Individual health needs vary - personalized medical advice required
+• Emergency situations require immediate professional medical attention
+• Recommendations may change - verify information with authoritative sources
+• Report any inaccuracies through proper channels
+      `
+    },
+    {
+      title: 'Dietary & Nutritional Disclaimer',
+      content: `
+• This app does NOT provide personalized dietary advice
+• Individual nutritional needs vary significantly
+• Consult registered dietitians for personalized nutrition plans
+• Consider allergies, medical conditions, and medications
+• Pregnant/nursing women should consult healthcare providers
+• Children's nutritional needs require professional guidance
+      `
+    },
+    {
+      title: 'Regulatory Compliance',
+      content: `
+• This app complies with applicable laws in our jurisdiction
+• Users responsible for compliance in their local jurisdiction
+• Health claims may not be evaluated by regulatory authorities
+• Not intended to diagnose, treat, cure, or prevent any disease
+• Dietary supplements and health products require professional guidance
+• International users subject to local laws and regulations
+      `
+    },
+    {
+      title: 'Technology Limitations',
+      content: `
+• App functionality depends on device capabilities and internet connectivity
+• We cannot guarantee uninterrupted or error-free operation
+• Data accuracy depends on user input and external sources
+• Regular updates may change functionality or content
+• Backup important data - we're not responsible for data loss
+• Third-party integrations subject to their own terms and limitations
+      `
+    },
+    {
+      title: 'Privacy & Data Protection',
+      content: `
+• Your privacy is important - see our Privacy Policy for details
+• Data processing complies with applicable privacy laws
+• You control your personal data and consent preferences
+• We implement appropriate security measures
+• Data breaches will be reported as required by law
+• You have rights regarding your personal data
+      `
+    },
+    {
+      title: 'Indemnification',
+      content: `
+By using this app, you agree to indemnify and hold harmless the developers, contributors, and associated parties from any claims, damages, or expenses arising from:
+
+• Your use or misuse of the application
+• Violation of these terms or applicable laws
+• Health decisions made based on app information
+• Any content you submit or share through the app
+• Third-party claims related to your app usage
+      `
+    },
+    {
+      title: 'Governing Law & Jurisdiction',
+      content: `
+• These terms governed by laws of [Your Jurisdiction]
+• Disputes subject to exclusive jurisdiction of [Your Courts]
+• If any provision is unenforceable, remainder remains in effect
+• These terms constitute the entire agreement
+• Updates to terms will be communicated appropriately
+• Continued use after changes constitutes acceptance
+      `
+    }
+  ],
+  finalWarning: 'BY PROCEEDING, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS. YOU UNDERSTAND THE RISKS AND LIMITATIONS, AND YOU AGREE TO USE THIS APP AT YOUR OWN RISK.'
+};

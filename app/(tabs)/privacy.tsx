@@ -25,6 +25,7 @@ import {
 } from 'lucide-react-native';
 import { usePrivacyCompliance } from '@/hooks/privacy-compliance';
 import { PrivacySettings } from '@/types/privacy';
+import { DISCLAIMER_CONTENT } from '@/constants/privacy-policy';
 
 export default function PrivacyScreen() {
   const {
@@ -235,6 +236,28 @@ export default function PrivacyScreen() {
             </Text>
           </View>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Terms & Disclaimers</Text>
+        
+        {DISCLAIMER_CONTENT.sections.map((section, index) => (
+          <View key={index} style={styles.disclaimerCard}>
+            <View style={styles.disclaimerHeader}>
+              <AlertTriangle color="#FF6B6B" size={20} />
+              <Text style={styles.disclaimerTitle}>{section.title}</Text>
+            </View>
+            <Text style={styles.disclaimerContent}>{section.content.trim()}</Text>
+          </View>
+        ))}
+        
+        <View style={styles.finalWarningCard}>
+          <View style={styles.finalWarningHeader}>
+            <FileText color="#FF6B6B" size={20} />
+            <Text style={styles.finalWarningTitle}>Important Agreement</Text>
+          </View>
+          <Text style={styles.finalWarningText}>{DISCLAIMER_CONTENT.finalWarning}</Text>
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -477,5 +500,56 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 16,
     marginBottom: 4,
+  },
+  disclaimerCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF6B6B',
+  },
+  disclaimerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  disclaimerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333333',
+    marginLeft: 8,
+  },
+  disclaimerContent: {
+    fontSize: 14,
+    color: '#666666',
+    lineHeight: 20,
+  },
+  finalWarningCard: {
+    backgroundColor: '#FFF5F5',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#FF6B6B',
+  },
+  finalWarningHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  finalWarningTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+    marginLeft: 8,
+  },
+  finalWarningText: {
+    fontSize: 14,
+    color: '#333333',
+    lineHeight: 20,
+    fontWeight: '500',
   },
 });
