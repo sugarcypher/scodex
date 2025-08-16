@@ -21,15 +21,20 @@ jobs:
         run: bun install
       - name: Build for web (set public URL)
         run: bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar/
-      - name: Remove service workers and inject unregister script
+      - name: Inject error overlay + SPA fallback
         run: |
           set -e
           cd web-build
-          rm -f sw.js service-worker.js serviceWorker.js registerSW.js sw.*.js service-worker.*.js || true
-          awk 'BEGIN{IGNORECASE=1}
-               /<head[^>]*>/ && !injected { print; print "  <script>(function(){ if (\"serviceWorker\" in navigator) { navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister()))).then(()=>{ try { caches && caches.keys && caches.keys().then(keys=>keys.forEach(k=>caches.delete(k))); } catch(e){} }); } })();</script>"; injected=1; next }
-               { print }' index.html > index.tmp && mv index.tmp index.html
           cp -f index.html 404.html
+          awk 'BEGIN{IGNORECASE=1}
+               /<head[^>]*>/ && !injected {
+                 print;
+                 print "  <base href=\"/codex-sugar/\">";
+                 print "  <style>#__err{position:fixed;inset:0;background:#111;color:#f55;font:14px/1.5 -apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:16px;white-space:pre-wrap;overflow:auto;display:none;}</style>";
+                 print "  <script>(function(){function sh(t){var d=document.getElementById(\"__err\");if(!d){d=document.createElement(\"pre\");d.id=\"__err\";document.body.appendChild(d);}d.style.display=\"block\";d.textContent=t;}window.addEventListener(\"error\",function(e){sh(String(e.error||e.message||e).slice(0,5000));});window.addEventListener(\"unhandledrejection\",function(e){sh(\"Promise rejection: \"+String(e.reason).slice(0,5000));});})();</script>";
+                 injected=1; next
+               }
+               { print }' index.html > index.tmp && mv index.tmp index.html
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
