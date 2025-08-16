@@ -37,7 +37,7 @@ jobs:
           echo "=== AVAILABLE EXPO COMMANDS ==="
           bunx expo --help | grep -E "(export|build|web)" || echo "No export/build commands found"
         
-      - name: Export Expo Web with correct public URL
+      - name: Export Expo Web
         run: |
           # Check current directory and list files
           echo "=== CURRENT DIRECTORY ==="
@@ -50,33 +50,13 @@ jobs:
             rm -rf web-build
           fi
           
-          # Try different export approaches
-          echo "=== TRYING EXPO EXPORT ==="
+          # Use the correct command for this Expo version
+          echo "=== USING CORRECT EXPO COMMAND ==="
+          echo "Expo version: $(bunx expo --version)"
+          echo "Using: expo export:web"
           
-          # Method 1: Try with public-url
-          echo "Method 1: expo export --platform web --public-url"
-          if bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar; then
-            echo "Method 1 succeeded!"
-          else
-            echo "Method 1 failed, trying Method 2..."
-            
-            # Method 2: Try without public-url
-            echo "Method 2: expo export --platform web"
-            if bunx expo export --platform web; then
-              echo "Method 2 succeeded!"
-            else
-              echo "Method 2 failed, trying Method 3..."
-              
-              # Method 3: Try with build command
-              echo "Method 3: expo build:web"
-              if bunx expo build:web; then
-                echo "Method 3 succeeded!"
-              else
-                echo "All methods failed!"
-                exit 1
-              fi
-            fi
-          fi
+          # Export web build
+          bunx expo export:web
           
           echo "=== EXPORTED FILES ==="
           ls -la
