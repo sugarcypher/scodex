@@ -21,20 +21,11 @@ jobs:
         run: bun install
       - name: Build for web (set public URL)
         run: bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar/
-      - name: Inject error overlay + SPA fallback
+      - name: Normalize base href and add SPA fallback
         run: |
-          set -e
           cd web-build
-          cp -f index.html 404.html
-          awk 'BEGIN{IGNORECASE=1}
-               /<head[^>]*>/ && !injected {
-                 print;
-                 print "  <base href=\"/codex-sugar/\">";
-                 print "  <style>#__err{position:fixed;inset:0;background:#111;color:#f55;font:14px/1.5 -apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:16px;white-space:pre-wrap;overflow:auto;display:none;}</style>";
-                 print "  <script>(function(){function sh(t){var d=document.getElementById(\"__err\");if(!d){d=document.createElement(\"pre\");d.id=\"__err\";document.body.appendChild(d);}d.style.display=\"block\";d.textContent=t;}window.addEventListener(\"error\",function(e){sh(String(e.error||e.message||e).slice(0,5000));});window.addEventListener(\"unhandledrejection\",function(e){sh(\"Promise rejection: \"+String(e.reason).slice(0,5000));});})();</script>";
-                 injected=1; next
-               }
-               { print }' index.html > index.tmp && mv index.tmp index.html
+          sed -i 's#/codex-sugar/codex-sugar/#/codex-sugar/#g' index.html || true
+          cp -f index.html 404.html || true
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
