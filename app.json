@@ -25,13 +25,14 @@
       "package": "app.rork.sugar-codex"
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "webpack"
     },
     "plugins": [
       [
         "expo-router",
         {
-          "origin": "https://rork.com/"
+          "origin": "https://sugarcypher.github.io"
         }
       ]
     ],
