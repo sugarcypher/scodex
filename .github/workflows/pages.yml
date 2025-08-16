@@ -33,13 +33,25 @@ jobs:
         run: |
           # Try different public URL formats
           echo "Trying public URL: https://sugarcypher.github.io/codex-sugar"
-          bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar
+          
+          # Export with error handling
+          if ! bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar; then
+            echo "Expo export failed, trying alternative approach..."
+            # Try without public-url parameter
+            bunx expo export --platform web
+          fi
           
           echo "=== EXPORTED FILES ==="
           ls -la web-build/
           
           echo "=== INDEX.HTML CONTENT ==="
           cat web-build/index.html
+          
+          # Verify the export worked
+          if [ ! -f "web-build/index.html" ]; then
+            echo "ERROR: index.html not found after export"
+            exit 1
+          fi
         
       - name: Fix base href and create SPA fallback
         run: |
@@ -47,11 +59,24 @@ jobs:
           echo "Current base href tags:"
           grep -n '<base href=' web-build/index.html || echo "No base tags found"
           
-          # Simple approach: remove all base tags first
-          sed -i '/<base href=/d' web-build/index.html
+          # Use a more robust approach that works on Ubuntu
+          # Create a temporary file with the correct content
+          awk '
+          /<head>/ { 
+            print $0; 
+            print "    <base href=\"/codex-sugar/\">"; 
+            next 
+          }
+          /<base href=/ { 
+            next  # Skip any existing base tags
+          }
+          { 
+            print $0 
+          }
+          ' web-build/index.html > web-build/index.html.new
           
-          # Then insert the correct one after <head>
-          sed -i 's|<head>|<head>\n    <base href="/codex-sugar/">|' web-build/index.html
+          # Replace the original file
+          mv web-build/index.html.new web-build/index.html
           
           echo "=== AFTER FIX ==="
           echo "Base href after fix:"
