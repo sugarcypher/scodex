@@ -2,7 +2,7 @@ name: Deploy Expo Web to GitHub Pages - Main
 
 on:
   push:
-    branches: ["**"]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -62,17 +62,23 @@ jobs:
           ls -la
           if [ -d "web-build" ]; then
             ls -la web-build/
+            echo "=== WEB-BUILD CONTENTS ==="
+            find web-build -type f -exec echo "File: {}" \; -exec head -5 {} \;
           else
             echo "web-build directory not found!"
             # Check for other possible output directories
             echo "Checking for other output directories..."
             ls -la | grep -E "(dist|build|out|web)"
+            echo "=== SEARCHING FOR HTML FILES ==="
+            find . -name "*.html" -o -name "index.*" 2>/dev/null || echo "No HTML files found"
           fi
           
           # Verify the export worked
           if [ -f "web-build/index.html" ]; then
             echo "=== INDEX.HTML CONTENT ==="
             cat web-build/index.html
+            echo "=== INDEX.HTML SIZE ==="
+            ls -la web-build/index.html
           else
             echo "ERROR: index.html not found after export"
             echo "Available files:"
