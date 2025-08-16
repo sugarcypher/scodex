@@ -31,14 +31,15 @@ jobs:
         
       - name: Export Expo Web with correct public URL
         run: |
-          # Set environment variable for the public URL
-          export EXPO_PUBLIC_URL=https://sugarcypher.github.io/codex-sugar
+          # Try different public URL formats
+          echo "Trying public URL: https://sugarcypher.github.io/codex-sugar"
+          bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar
           
-          # Try multiple approaches to ensure correct base href
-          bunx expo export --platform web --public-url $EXPO_PUBLIC_URL
-          
-          echo "Exported files:"
+          echo "=== EXPORTED FILES ==="
           ls -la web-build/
+          
+          echo "=== INDEX.HTML CONTENT ==="
+          cat web-build/index.html
         
       - name: Fix base href and create SPA fallback
         run: |
@@ -46,20 +47,11 @@ jobs:
           echo "Current base href tags:"
           grep -n '<base href=' web-build/index.html || echo "No base tags found"
           
-          # Use awk to completely rewrite the file with correct base href
-          awk '
-          /<head>/ { 
-            print $0; 
-            print "    <base href=\"/codex-sugar/\">"; 
-            next 
-          }
-          /<base href=/ { 
-            next  # Skip any existing base tags
-          }
-          { 
-            print $0 
-          }
-          ' web-build/index.html > web-build/index.html.tmp && mv web-build/index.html.tmp web-build/index.html
+          # Simple approach: remove all base tags first
+          sed -i '/<base href=/d' web-build/index.html
+          
+          # Then insert the correct one after <head>
+          sed -i 's|<head>|<head>\n    <base href="/codex-sugar/">|' web-build/index.html
           
           echo "=== AFTER FIX ==="
           echo "Base href after fix:"
