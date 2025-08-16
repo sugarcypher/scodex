@@ -21,10 +21,13 @@ jobs:
         run: bun install
       - name: Build for web (set public URL)
         run: bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar/
-      - name: Normalize base href and add SPA fallback
+      - name: Force correct base href + SPA fallback
         run: |
           cd web-build
-          sed -i 's#/codex-sugar/codex-sugar/#/codex-sugar/#g' index.html || true
+          # remove all <base> tags
+          sed -i '/<base href=/d' index.html
+          # inject exactly one clean base
+          awk 'BEGIN{IGNORECASE=1} /<head[^>]*>/ && !done { print; print "  <base href=\"/codex-sugar/\">"; done=1; next } { print }' index.html > index.tmp && mv index.tmp index.html
           cp -f index.html 404.html || true
       - name: Setup Pages
         uses: actions/configure-pages@v4
