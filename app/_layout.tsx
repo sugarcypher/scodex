@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SugarContext } from "@/hooks/sugar-store";
 import { PrivacyComplianceContext } from "@/hooks/privacy-compliance";
+import { trpc, trpcClient } from "@/lib/trpc";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -64,14 +65,16 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <PrivacyComplianceContext>
-        <SugarContext>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <RootLayoutNav />
-          </GestureHandlerRootView>
-        </SugarContext>
-      </PrivacyComplianceContext>
-    </QueryClientProvider>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <PrivacyComplianceContext>
+          <SugarContext>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <RootLayoutNav />
+            </GestureHandlerRootView>
+          </SugarContext>
+        </PrivacyComplianceContext>
+      </QueryClientProvider>
+    </trpc.Provider>
   );
 }
