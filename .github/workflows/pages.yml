@@ -30,18 +30,30 @@ jobs:
         run: bun install
         
       - name: Export Expo Web with correct public URL
-        run: bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar/
-        
-      - name: Ensure correct base href and create SPA fallback
         run: |
-          # Ensure exactly one correct base href (idempotent)
-          if grep -q '<base href=' web-build/index.html; then
-            # Remove any existing base tags
-            sed -i '/<base href=/d' web-build/index.html
-          fi
+          # Try without trailing slash first
+          bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar
+          # If that doesn't work, the sed replacement below will fix it
+        
+      - name: Fix base href and create SPA fallback
+        run: |
+          # Remove ALL existing base tags (including any with wrong paths)
+          sed -i '/<base href=/d' web-build/index.html
           
-          # Insert correct base href after <head> tag
+          # Insert the correct base href after <head> tag
           sed -i 's|<head>|<head>\n    <base href="/codex-sugar/">|' web-build/index.html
+          
+          # Double-check: remove any remaining base tags and re-insert
+          sed -i '/<base href=/d' web-build/index.html
+          sed -i 's|<head>|<head>\n    <base href="/codex-sugar/">|' web-build/index.html
+          
+          # Verify the fix worked
+          echo "Base href after fix:"
+          grep '<base href=' web-build/index.html || echo "No base href found - this is wrong!"
+          
+          # Also check for any duplicate or wrong base tags
+          echo "All base tags found:"
+          grep -n '<base href=' web-build/index.html || echo "No base tags found"
           
           # Copy index.html to 404.html for SPA routing
           cp web-build/index.html web-build/404.html
