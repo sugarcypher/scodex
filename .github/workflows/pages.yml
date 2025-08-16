@@ -2,7 +2,7 @@ name: Deploy Expo Web to GitHub Pages - Main
 
 on:
   push:
-    branches: [ main ]
+    branches: ["**"]
   workflow_dispatch:
 
 permissions:
