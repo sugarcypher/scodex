@@ -31,29 +31,48 @@ jobs:
         
       - name: Export Expo Web with correct public URL
         run: |
-          # Try without trailing slash first
-          bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar
-          # If that doesn't work, the sed replacement below will fix it
+          # Set environment variable for the public URL
+          export EXPO_PUBLIC_URL=https://sugarcypher.github.io/codex-sugar
+          
+          # Try multiple approaches to ensure correct base href
+          bunx expo export --platform web --public-url $EXPO_PUBLIC_URL
+          
+          echo "Exported files:"
+          ls -la web-build/
         
       - name: Fix base href and create SPA fallback
         run: |
-          # Remove ALL existing base tags (including any with wrong paths)
-          sed -i '/<base href=/d' web-build/index.html
+          echo "=== BEFORE FIX ==="
+          echo "Current base href tags:"
+          grep -n '<base href=' web-build/index.html || echo "No base tags found"
           
-          # Insert the correct base href after <head> tag
-          sed -i 's|<head>|<head>\n    <base href="/codex-sugar/">|' web-build/index.html
+          # Use awk to completely rewrite the file with correct base href
+          awk '
+          /<head>/ { 
+            print $0; 
+            print "    <base href=\"/codex-sugar/\">"; 
+            next 
+          }
+          /<base href=/ { 
+            next  # Skip any existing base tags
+          }
+          { 
+            print $0 
+          }
+          ' web-build/index.html > web-build/index.html.tmp && mv web-build/index.html.tmp web-build/index.html
           
-          # Double-check: remove any remaining base tags and re-insert
-          sed -i '/<base href=/d' web-build/index.html
-          sed -i 's|<head>|<head>\n    <base href="/codex-sugar/">|' web-build/index.html
-          
-          # Verify the fix worked
+          echo "=== AFTER FIX ==="
           echo "Base href after fix:"
           grep '<base href=' web-build/index.html || echo "No base href found - this is wrong!"
           
-          # Also check for any duplicate or wrong base tags
-          echo "All base tags found:"
-          grep -n '<base href=' web-build/index.html || echo "No base tags found"
+          # Verify exactly one correct base href
+          base_count=$(grep -c '<base href="/codex-sugar/">' web-build/index.html || echo "0")
+          echo "Correct base href count: $base_count"
+          
+          if [ "$base_count" -ne 1 ]; then
+            echo "ERROR: Expected exactly 1 base href, found $base_count"
+            exit 1
+          fi
           
           # Copy index.html to 404.html for SPA routing
           cp web-build/index.html web-build/404.html
