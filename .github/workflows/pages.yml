@@ -27,29 +27,76 @@ jobs:
           bun-version: latest
           
       - name: Install dependencies
-        run: bun install
+        run: |
+          bun install
+          
+          echo "=== EXPO VERSION INFO ==="
+          bunx expo --version
+          bunx expo --help | head -20
+          
+          echo "=== AVAILABLE EXPO COMMANDS ==="
+          bunx expo --help | grep -E "(export|build|web)" || echo "No export/build commands found"
         
       - name: Export Expo Web with correct public URL
         run: |
-          # Try different public URL formats
-          echo "Trying public URL: https://sugarcypher.github.io/codex-sugar"
+          # Check current directory and list files
+          echo "=== CURRENT DIRECTORY ==="
+          pwd
+          ls -la
           
-          # Export with error handling
-          if ! bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar; then
-            echo "Expo export failed, trying alternative approach..."
-            # Try without public-url parameter
-            bunx expo export --platform web
+          # Check if web-build directory exists
+          if [ -d "web-build" ]; then
+            echo "web-build directory already exists, removing..."
+            rm -rf web-build
+          fi
+          
+          # Try different export approaches
+          echo "=== TRYING EXPO EXPORT ==="
+          
+          # Method 1: Try with public-url
+          echo "Method 1: expo export --platform web --public-url"
+          if bunx expo export --platform web --public-url https://sugarcypher.github.io/codex-sugar; then
+            echo "Method 1 succeeded!"
+          else
+            echo "Method 1 failed, trying Method 2..."
+            
+            # Method 2: Try without public-url
+            echo "Method 2: expo export --platform web"
+            if bunx expo export --platform web; then
+              echo "Method 2 succeeded!"
+            else
+              echo "Method 2 failed, trying Method 3..."
+              
+              # Method 3: Try with build command
+              echo "Method 3: expo build:web"
+              if bunx expo build:web; then
+                echo "Method 3 succeeded!"
+              else
+                echo "All methods failed!"
+                exit 1
+              fi
+            fi
           fi
           
           echo "=== EXPORTED FILES ==="
-          ls -la web-build/
-          
-          echo "=== INDEX.HTML CONTENT ==="
-          cat web-build/index.html
+          ls -la
+          if [ -d "web-build" ]; then
+            ls -la web-build/
+          else
+            echo "web-build directory not found!"
+            # Check for other possible output directories
+            echo "Checking for other output directories..."
+            ls -la | grep -E "(dist|build|out|web)"
+          fi
           
           # Verify the export worked
-          if [ ! -f "web-build/index.html" ]; then
+          if [ -f "web-build/index.html" ]; then
+            echo "=== INDEX.HTML CONTENT ==="
+            cat web-build/index.html
+          else
             echo "ERROR: index.html not found after export"
+            echo "Available files:"
+            find . -name "*.html" -o -name "index.*" 2>/dev/null || echo "No HTML files found"
             exit 1
           fi
         
