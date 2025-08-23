@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Animated, Image } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { GraduationCap } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function SplashScreen() {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [scaleAnim] = useState(new Animated.Value(0.8));
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -25,28 +26,28 @@ export default function SplashScreen() {
           useNativeDriver: true,
         }),
       ]).start();
-
-      // Check if user has seen onboarding
-      try {
-        const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
-        
-        setTimeout(() => {
-          if (hasSeenOnboarding === 'true') {
-            router.replace('/(tabs)');
-          } else {
-            router.replace('/onboarding');
-          }
-        }, 3500); // Increased time to read the new messaging
-      } catch (error) {
-        console.log('Error checking onboarding status:', error);
-        setTimeout(() => {
-          router.replace('/onboarding');
-        }, 3500);
-      }
     };
 
     initializeApp();
   }, [fadeAnim, scaleAnim]);
+
+  const handleAcceptTerms = async () => {
+    setTermsAccepted(true);
+    
+    // Check if user has seen onboarding
+    try {
+      const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
+      
+      if (hasSeenOnboarding === 'true') {
+        router.replace('/(tabs)');
+      } else {
+        router.replace('/onboarding');
+      }
+    } catch (error) {
+      console.log('Error checking onboarding status:', error);
+      router.replace('/onboarding');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -54,47 +55,76 @@ export default function SplashScreen() {
         colors={['#0f0c29', '#24243e', '#302b63', '#0f0c29']}
         style={styles.gradient}
       >
-        <Animated.View 
-          style={[
-            styles.content,
-            {
-              opacity: fadeAnim,
-              transform: [{ scale: scaleAnim }]
-            }
-          ]}
-        >
-          {/* Sugar Codex Logo */}
-          <View style={styles.logoContainer}>
-            <Image 
-              source={require('../assets/images/icon.png')} 
-              style={styles.logo}
-              resizeMode="contain"
-            />
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Animated.View 
+            style={[
+              styles.content,
+              {
+                opacity: fadeAnim,
+                transform: [{ scale: scaleAnim }]
+              }
+            ]}
+          >
+            {/* Sugar Codex Logo */}
+            <View style={styles.logoContainer}>
+              <Image 
+                source={require('../assets/images/icon.png')} 
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+            
+            {/* Main Title */}
+            <Text style={styles.title}>Sugar Codex</Text>
+            
+            {/* New Positioning Statement */}
+            <Text style={styles.positioning}>THE Education App</Text>
+            
+            {/* Subtitle with SugarCypher reference */}
+            <Text style={styles.subtitle}>
+              Decoding sugar & its impact
+            </Text>
+            
+            {/* SugarCypher complement message */}
+            <Text style={styles.complement}>
+              The perfect companion to SugarCypher
+            </Text>
+            
+            {/* Loading animation */}
+            <View style={styles.loadingContainer}>
+              <View style={styles.loadingDot} />
+              <View style={styles.loadingDot} />
+              <View style={styles.loadingDot} />
+            </View>
+          </Animated.View>
+
+          {/* Terms and Conditions Section */}
+          <View style={styles.termsContainer}>
+            <Text style={styles.termsTitle}>Terms and Conditions</Text>
+            <ScrollView style={styles.termsTextContainer}>
+              <Text style={styles.termsText}>
+                By using Sugar Codex, you agree to our terms of service and privacy policy. 
+                This app is designed for educational purposes and should not replace professional medical advice. 
+                Always consult with healthcare professionals regarding your health and nutrition.
+              </Text>
+              <Text style={styles.termsText}>
+                Sugar Codex collects minimal data necessary for app functionality and does not share personal information with third parties. 
+                Your privacy and data security are our top priorities.
+              </Text>
+            </ScrollView>
+            
+            {/* Accept Button */}
+            <TouchableOpacity 
+              style={[styles.acceptButton, termsAccepted && styles.acceptButtonDisabled]} 
+              onPress={handleAcceptTerms}
+              disabled={termsAccepted}
+            >
+              <Text style={styles.acceptButtonText}>
+                {termsAccepted ? 'Accepted ✓' : 'I Accept the Terms'}
+              </Text>
+            </TouchableOpacity>
           </View>
-          
-          {/* Main Title */}
-          <Text style={styles.title}>Sugar Codex</Text>
-          
-          {/* New Positioning Statement */}
-          <Text style={styles.positioning}>THE Education App</Text>
-          
-          {/* Subtitle with SugarCypher reference */}
-          <Text style={styles.subtitle}>
-            Decoding sugar & its impact
-          </Text>
-          
-          {/* SugarCypher complement message */}
-          <Text style={styles.complement}>
-            The perfect companion to SugarCypher
-          </Text>
-          
-          {/* Loading animation */}
-          <View style={styles.loadingContainer}>
-            <View style={styles.loadingDot} />
-            <View style={[styles.loadingDot, { animationDelay: '0.2s' }]} />
-            <View style={[styles.loadingDot, { animationDelay: '0.4s' }]} />
-          </View>
-        </Animated.View>
+        </ScrollView>
       </LinearGradient>
     </View>
   );
@@ -108,6 +138,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
   },
   content: {
     alignItems: 'center',
@@ -182,5 +218,50 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF6B6B',
     marginHorizontal: 4,
     opacity: 0.3,
+  },
+  termsContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  termsTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+    marginBottom: 10,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  termsTextContainer: {
+    maxHeight: 200, // Limit height for scrolling
+  },
+  termsText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    lineHeight: 24,
+    marginBottom: 15,
+    textAlign: 'justify',
+    opacity: 0.9,
+  },
+  acceptButton: {
+    backgroundColor: '#FF6B6B',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: 20,
+  },
+  acceptButtonDisabled: {
+    backgroundColor: '#888888',
+    opacity: 0.7,
+  },
+  acceptButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
