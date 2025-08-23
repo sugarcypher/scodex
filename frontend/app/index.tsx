@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { router } from 'expo-router';
 import { GraduationCap } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -36,12 +36,12 @@ export default function SplashScreen() {
           } else {
             router.replace('/onboarding');
           }
-        }, 2500);
+        }, 3500); // Increased time to read the new messaging
       } catch (error) {
         console.log('Error checking onboarding status:', error);
         setTimeout(() => {
           router.replace('/onboarding');
-        }, 2500);
+        }, 3500);
       }
     };
 
@@ -63,11 +63,32 @@ export default function SplashScreen() {
             }
           ]}
         >
+          {/* Sugar Codex Logo */}
           <View style={styles.logoContainer}>
-            <GraduationCap color="#FF6B6B" size={64} />
+            <Image 
+              source={require('../assets/images/icon.png')} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
+          
+          {/* Main Title */}
           <Text style={styles.title}>Sugar Codex</Text>
-          <Text style={styles.subtitle}>Decoding sugar & its impact</Text>
+          
+          {/* New Positioning Statement */}
+          <Text style={styles.positioning}>THE Education App</Text>
+          
+          {/* Subtitle with SugarCypher reference */}
+          <Text style={styles.subtitle}>
+            Decoding sugar & its impact
+          </Text>
+          
+          {/* SugarCypher complement message */}
+          <Text style={styles.complement}>
+            The perfect companion to SugarCypher
+          </Text>
+          
+          {/* Loading animation */}
           <View style={styles.loadingContainer}>
             <View style={styles.loadingDot} />
             <View style={[styles.loadingDot, { animationDelay: '0.2s' }]} />
@@ -90,17 +111,27 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   logoContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: 'rgba(255, 107, 107, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: 'rgba(255, 107, 107, 0.3)',
+    shadowColor: '#FF6B6B',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  logo: {
+    width: 100,
+    height: 100,
   },
   title: {
     fontSize: 42,
@@ -108,12 +139,36 @@ const styles = StyleSheet.create({
     color: '#FF6B6B',
     marginBottom: 8,
     textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  positioning: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#FFD93D',
+    marginBottom: 8,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   subtitle: {
     fontSize: 18,
     color: '#FFD93D',
     textAlign: 'center',
+    marginBottom: 12,
+    opacity: 0.9,
+  },
+  complement: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    textAlign: 'center',
     marginBottom: 40,
+    opacity: 0.8,
+    fontStyle: 'italic',
   },
   loadingContainer: {
     flexDirection: 'row',
