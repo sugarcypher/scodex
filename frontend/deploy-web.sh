@@ -30,3 +30,12 @@ else
     echo "❌ Build failed. Check the error messages above."
     exit 1
 fi
+
+# Fix absolute asset paths for GitHub Pages
+if [ -f "dist/index.html" ]; then
+    echo "🔧 Rewriting absolute asset paths to relative for GitHub Pages..."
+    sed -i 's|href="/|href="./|g' dist/index.html
+    sed -i 's|src="/|src="./|g' dist/index.html
+    # Ensure GitHub Pages serves underscored folders
+    touch dist/.nojekyll
+fi
