@@ -5,6 +5,7 @@ import { GraduationCap } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// 🚀 DEPLOYMENT ID: FRESH-DEPLOY-2025-08-23
 export default function SplashScreen() {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [scaleAnim] = useState(new Animated.Value(0.8));
