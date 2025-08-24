@@ -34,7 +34,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
           
       - name: 🟡 Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -45,7 +44,7 @@ jobs:
         run: |
           echo "Installing frontend dependencies..."
           cd frontend
-          bun install --frozen-lockfile
+          bun install
           echo "Dependencies installed successfully!"
           
       - name: 🏗️ Build Web Version
