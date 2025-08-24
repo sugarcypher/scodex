@@ -1,0 +1,85 @@
+name: 🚀 Master Deploy - Sugar Codex
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  BUN_VERSION: 'latest'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 🟡 Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+          
+      - name: 📦 Install Dependencies
+        run: |
+          echo "Installing frontend dependencies..."
+          cd frontend
+          bun install --frozen-lockfile
+          echo "Dependencies installed successfully!"
+          
+      - name: 🏗️ Build Web Version
+        run: |
+          echo "Building Sugar Codex web version..."
+          cd frontend
+          npx expo export --platform web --clear
+          echo "Build completed successfully!"
+          
+      - name: 🔍 Verify Build Output
+        run: |
+          echo "Verifying build output..."
+          cd frontend/dist
+          ls -la
+          echo "JavaScript bundle:"
+          ls -la _expo/static/js/web/
+          echo "Assets:"
+          ls -la assets/
+          echo "Build verification complete!"
+          
+      - name: 📄 Setup GitHub Pages
+        uses: actions/configure-pages@v4
+        
+      - name: 📤 Upload Build Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './frontend/dist'
+          
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
+      - name: ✅ Deployment Complete
+        run: |
+          echo "🎉 Sugar Codex deployed successfully!"
+          echo "🌐 URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "📱 App should now work without white screen!"
