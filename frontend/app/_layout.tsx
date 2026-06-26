@@ -41,20 +41,6 @@ function RootLayoutNav() {
           headerBackTitle: "Back",
         }} 
       />
-      <Stack.Screen 
-        name="compare" 
-        options={{ 
-          title: "Compare Sugars",
-          headerBackTitle: "Back",
-        }} 
-      />
-      <Stack.Screen 
-        name="education" 
-        options={{ 
-          title: "Sugar Education",
-          headerBackTitle: "Home",
-        }} 
-      />
     </Stack>
   );
 }

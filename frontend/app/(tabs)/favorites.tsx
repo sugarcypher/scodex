@@ -18,7 +18,7 @@ export default function FavoritesScreen() {
   };
   
   const navigateToEducation = () => {
-    router.push('/education');
+    router.push('/(tabs)/education');
   };
   
   const navigateToHome = () => {
